@@ -15,12 +15,32 @@ mongo = PyMongo(app)
 
 @app.route('/add_noticia', methods=['POST'])
 def add_noticia():
+    msg = ''
     autores = mongo.db.autores
     noticias = mongo.db.noticias
     
-    autor = request.json['autor']
-    titulo = request.json['titulo']
-    texto = request.json['texto']
+    try:
+        autor = request.json['autor']
+    except:
+        autor = ''
+    try:
+        titulo = request.json['titulo']
+    except:
+        titulo = ''
+    try:
+        texto = request.json['texto']
+    except:
+        texto = ''
+        
+    if titulo == '':
+        msg = msg + 'O título não pode ficar em branco;'
+    if texto == '':
+        msg = msg + 'O texto não pode ficar em branco;'    
+    if autor == '':
+        msg = msg + 'O autor não pode ficar em branco;'
+            
+    if not msg == '':
+        return jsonify({'erros': msg})
     
     o_autor = autores.find_one({'autor': autor})
     
@@ -44,11 +64,9 @@ def get_all_noticias():
         
     return jsonify({'result': output})
 
-@app.route('/get_noticias_autor', methods=['GET'])
-def get_noticias_autor():
+@app.route('/get_noticias_autor/<autor>', methods=['GET'])
+def get_noticias_autor(autor):
     autores = mongo.db.autores
-    
-    autor = request.json['autor']
     
     o_autor = autores.find_one({'autor': autor})
     
@@ -64,11 +82,10 @@ def get_noticias_autor():
         
     return jsonify({'result': output})
 
-@app.route('/get_noticias_titulo', methods=['GET'])
-def get_noticias_titulo():
+@app.route('/get_noticias_titulo/<titulo>', methods=['GET'])
+def get_noticias_titulo(titulo):
     autores = mongo.db.autores
     noticias = mongo.db.noticias
-    titulo = request.json['titulo']
        
     output = []
     
@@ -81,11 +98,10 @@ def get_noticias_titulo():
         
     return jsonify({'result': output})    
 
-@app.route('/get_noticias_texto', methods=['GET'])
-def get_noticias_texto():
+@app.route('/get_noticias_texto/<texto>', methods=['GET'])
+def get_noticias_texto(texto):
     autores = mongo.db.autores
     noticias = mongo.db.noticias
-    texto = request.json['texto']
        
     output = []
     
@@ -100,12 +116,32 @@ def get_noticias_texto():
 
 @app.route('/put_noticia', methods=['PUT'])
 def update():
+    msg = ''
     autores = mongo.db.autores
     noticias = mongo.db.noticias
     
-    autor = request.json['autor']
-    titulo = request.json['titulo']
-    texto = request.json['texto']
+    try:
+        autor = request.json['autor']
+    except:
+        autor = ''
+    try:
+        titulo = request.json['titulo']
+    except:
+        titulo = ''
+    try:
+        texto = request.json['texto']
+    except:
+        texto = ''
+        
+    if titulo == '':
+        msg = msg + 'O título não pode ficar em branco;'
+    if texto == '':
+        msg = msg + 'O texto não pode ficar em branco;'    
+    if autor == '':
+        msg = msg + 'O autor não pode ficar em branco;'
+            
+    if not msg == '':
+        return jsonify({'erros': msg})
     
     o_autor = autores.find_one({'autor': autor})
     
@@ -116,19 +152,17 @@ def update():
     
     noticias.save(atualizacao)
     
-    return 'Notícia atualizada'
+    return jsonify({'result': 'Notícia atualizada'})
 
-@app.route('/del_noticia', methods=['DELETE'])
-def delete():
+@app.route('/del_noticia/<titulo>', methods=['DELETE'])
+def delete(titulo):
     noticias = mongo.db.noticias
-    
-    titulo = request.json['titulo']
-            
+   
     deletar = noticias.find_one({'titulo': titulo})
         
     noticias.delete_one(deletar)
     
-    return 'Notícia apagada'
+    return jsonify({'result': 'Notícia apagada'})
 
 if __name__ == '__main__':
     app.run(debug=True)
