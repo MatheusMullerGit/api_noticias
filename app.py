@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 import pymongo
 from pymongo import MongoClient
 from flask_pymongo import PyMongo
@@ -12,6 +12,18 @@ app.config['MONGO_DBNAME'] = os.getenv('MONGO_DBNAME')
 app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 
 mongo = PyMongo(app)
+
+#Rota Padrão
+@app.route('/')
+def start():
+    return make_response(jsonify({'success':'Api Funcionando'}))
+
+# Tratativa erro 404
+@app.errorhandler(404)
+def handle_404_error(_error):
+    """Return a http 404 error to client"""
+    return make_response(jsonify({'error': 'Rota nao encontrada,'}), 404)
+
 
 @app.route('/add_noticia', methods=['POST'])
 def add_noticia():
